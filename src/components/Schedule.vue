@@ -1,29 +1,29 @@
 <template>
-    <div class="schedule">
-    	<div class="time-ground">
-    		<ul>
-    			<li v-for="time in pageTimeGround">
-    				<span>{{time}}</span>
-    				<p :style="timeListSty"></p>
-    			</li>
-    		</ul>
-    	</div>
-    	<div class="task-ground">
-    		<ul>
-    			<li v-for="(week, index) in weekGround" class="task-list">
-    				<p>{{week}}</p>
-    				<ul :style="taskListSty">
-    					<li class="task-list-item" v-for="detail in taskDetail[index]" :style="detail.styleObj" @click="showDetail(detail, week)">
-    						<p>{{detail.dateStart}} - {{detail.dateEnd}}</p>
-    						<h3>{{detail.title}}</h3>
-    					</li>
-    				</ul>
-    			</li>
-    		</ul>
-    	</div>
-
-    	<modal :show="showModal" :show-modal-detail="showModalDetail"> </modal>
+  <div class="schedule">
+    <div class="time-ground">
+      <ul>
+        <li v-for="(time , index) in pageTimeGround" v-bind:key="index">
+          <span>{{time}}</span>
+          <p :style="timeListSty"></p>
+        </li>
+      </ul>
     </div>
+    <div class="task-ground">
+      <ul>
+        <li v-for="(week, index) in weekGround" class="task-list" v-bind:key="index">
+          <p>{{week}}</p>
+          <ul :style="taskListSty">
+            <li class="task-list-item" v-for="(detail,idx) in taskDetail[index]" :style="detail.styleObj" @click="showDetail(detail, week)" v-bind:key="idx">
+              <p>{{detail.dateStart}} - {{detail.dateEnd}}</p>
+              <h3>{{detail.title}}</h3>
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+
+    <modal :show="showModal" :show-modal-detail="showModalDetail"> </modal>
+  </div>
 </template>
 
 <style scoped>
@@ -98,11 +98,11 @@ export default {
 	props: {
 		timeGround: {
 			type: Array,
-			default: []
+			default: () => []
 		},
 		weekGround: {
 			type: Array,
-			default: [
+			default: () => [
 				'Monday',
 				'Tuesday',
 				'Wednesday',
@@ -112,7 +112,7 @@ export default {
 		},
 		taskDetail: {
 			type: Array,
-			default: []
+			default: () => []
 		},
 		color: {
 			type: Array,
@@ -178,28 +178,28 @@ export default {
 		// console.log(minMin);
 		// console.log(maxTime);
 		for (let i = 0; i < this.taskDetail.length; i++) {
-		    for (let j = 0; j < this.taskDetail[i].length; j++) {
-		    	// console.log(this.taskDetail[i][j]);
-		        let startMin = this.taskDetail[i][j].dateStart.split(':')[0] * 60 + this.taskDetail[i][j].dateStart.split(':')[1] * 1;
-		        let endMin = this.taskDetail[i][j].dateEnd.split(':')[0] * 60 + this.taskDetail[i][j].dateEnd.split(':')[1] * 1;
-		        if(startMin < minMin || endMin > maxMin) {
-		        	this.taskDetail[i].splice(j, 1);
-		        	j--;
-		        	continue
-		        };
-		        // console.log(endMin);
-		        let difMin = endMin - startMin;
-		        // console.log(startMin);
-		        // console.log(endMin);
-		        this.taskDetail[i][j].styleObj = {
-		            height: difMin * 100 / 60 + 'px',
-		            top: ((startMin - (this.pageTimeGround[0].split(":")[0] * 60 + this.pageTimeGround[0].split(":")[1] * 1)) * 100 / 60) + 50 + 'px',
-		            backgroundColor: this.color[~~(Math.random() * this.color.length)]
-		        }
-		        // console.log(this.color[~~(Math.random() * 4)]);
-		        // console.log(this.taskDetail);
-		        // console.log(this.timeGround);
-		    }
+      for (let j = 0; j < this.taskDetail[i].length; j++) {
+        // console.log(this.taskDetail[i][j]);
+        let startMin = this.taskDetail[i][j].dateStart.split(':')[0] * 60 + this.taskDetail[i][j].dateStart.split(':')[1] * 1;
+        let endMin = this.taskDetail[i][j].dateEnd.split(':')[0] * 60 + this.taskDetail[i][j].dateEnd.split(':')[1] * 1;
+        if(startMin < minMin || endMin > maxMin) {
+          this.taskDetail[i].splice(j, 1);
+          j--;
+          continue
+        }
+        // console.log(endMin);
+        let difMin = endMin - startMin;
+        // console.log(startMin);
+        // console.log(endMin);
+        this.taskDetail[i][j].styleObj = {
+          height: difMin * 100 / 60 + 'px',
+          top: ((startMin - (this.pageTimeGround[0].split(":")[0] * 60 + this.pageTimeGround[0].split(":")[1] * 1)) * 100 / 60) + 50 + 'px',
+          backgroundColor: this.color[~~(Math.random() * this.color.length)]
+        }
+        // console.log(this.color[~~(Math.random() * 4)]);
+        // console.log(this.taskDetail);
+        // console.log(this.timeGround);
+      }
 		}
 		console.log(this.taskDetail);
 	},

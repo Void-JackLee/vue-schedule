@@ -2,9 +2,9 @@
   <!--Saturday-->
   <div id="app">
     <Schedule
-      :time-ground="['09:00', '21:00']"
-      :week-ground="['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']"
-      :color="[
+        :time-ground="['09:00', '21:00']"
+        :week-ground="['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']"
+        :color="[
         '#2B2E4A',
         '#521262',
         '#903749',
@@ -12,7 +12,7 @@
         '#40514E',
         '#537780',
       ]"
-      :task-detail="[
+        :task-detail="[
         [
           {
             dateStart: '09:30',
@@ -100,8 +100,13 @@
 </template>
 
 <script>
+import Schedule from "./components/Schedule";
+
 export default {
-  name: 'app'
+  name: 'app',
+  components: {
+    Schedule
+  }
 }
 </script>
 
