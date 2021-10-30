@@ -11,7 +11,8 @@
           <div class="modal-body">
             <h2>{{showModalDetail.title}}</h2>
             <small>{{showModalDetail.week}}  {{showModalDetail.dateStart}} - {{showModalDetail.dateEnd}}</small>
-            <p>{{showModalDetail.detail}}</p>
+            <div v-if="showModalDetail.type === 'html'" v-html="showModalDetail.detail"></div>
+            <p v-else>{{showModalDetail.detail}}</p>
           </div>
         </div>
       </div>

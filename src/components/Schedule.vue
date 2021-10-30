@@ -14,22 +14,20 @@
         <li class="task-list task-list-blank"
             :style="`width: ${unit.width}%;`"/>
         <li v-for="(week, index) in weekGround" class="task-list" v-bind:key="index"
-            :style="'width: ' + unit.width + '%'">
+            :style="`width: ${unit.width}%;`">
           <p
               :style="`--unitPerHeight: ${unit.height}px`"
           >{{week}}</p>
           <ul :style="taskListSty">
             <li class="task-list-item" v-for="(detail,idx) in taskDetail[index]" :style="detail.styleObj" @click="showDetail(detail, week)" v-bind:key="idx">
               <p>{{detail.dateStart}} - {{detail.dateEnd}}</p>
-              <h3>{{detail.title}}</h3>
+              <div v-html="detail.html"></div>
             </li>
           </ul>
         </li>
       </ul>
     </div>
     <div :style="`height: ${parseInt(taskListSty.height.substr(0,taskListSty.height.length - 2)) + unit.height}px`"></div>
-
-    <modal :show="showModal" :show-modal-detail="showModalDetail"> </modal>
   </div>
 </template>
 
@@ -119,13 +117,17 @@
       margin: 1rem 0 0 1rem;
       font-size: 0.8rem;
       color: #EDF2F6;
-    }
 
-    h3 {
-      color: #E0E7E9;
-      margin: 1rem 0 0 1rem;
+      @media screen and (max-width: 778px) {
+        margin: 0.3rem 0 0 0.3rem;
+      }
+
+      @media screen and (max-width: 358px) {
+        margin: 0.1rem 0 0 0.1rem;
+      }
     }
 	}
+
 </style>
 
 <style>
@@ -135,7 +137,6 @@
 <script>
 const data = {
   pageTimeGround: [],
-  showModal: false,
   showModalDetail: {
     dateStart: '09:30',
     dateEnd: '10:30',
@@ -162,7 +163,8 @@ const data = {
 }
 
 
-import Modal from './Modal.vue';
+
+
 export default {
 	name: 'Schedule',
 	props: {
@@ -196,81 +198,75 @@ export default {
 					"#537780",
 				]
 			}
-		}
+		},
+    unitHeight: {
+      type: Number,
+      default: () => 100
+    }
 	},
-	components: {
-		Modal: Modal
-	},
-	// watch: {
-	// 	timeGround: function(value){
-	// 		this.timeGround = value
-	// 	}
-	// },
 	watch: {
 		timeGround(value) {
-
-				// console.log('value=', value);
 				this.pageTimeGround = this.initTimeGroud(value);
-				// return value;
-		}
+		},
+    taskDetail() {
+      this.init();
+    }
 	},
 	data() {
 		return data
 	},
-	created() {
-    this.unit.width = (100 / (this.weekGround.length + 1));
-    this.timeListSty.width = this.unit.width * this.weekGround.length + '%'
-    this.timeListSty.marginLeft = this.unit.width + "%"
-		// console.log(this.ta)
-		this.pageTimeGround = this.initTimeGroud(this.timeGround);
-
-		let maxTime = this.pageTimeGround[this.pageTimeGround.length - 1];
-		let minTime = this.pageTimeGround[0];
-		let maxMin = maxTime.split(':')[0] * 60 + maxTime.split(':')[1] * 1;
-		let minMin = minTime.split(':')[0] * 60 + minTime.split(':')[1] * 1;
-		// console.log(maxMin);
-		// console.log(minMin);
-		// console.log(maxTime);
-		for (let i = 0; i < this.taskDetail.length; i++) {
-      for (let j = 0; j < this.taskDetail[i].length; j++) {
-        // console.log(this.taskDetail[i][j]);
-        let startMin = this.taskDetail[i][j].dateStart.split(':')[0] * 60 + this.taskDetail[i][j].dateStart.split(':')[1] * 1;
-        let endMin = this.taskDetail[i][j].dateEnd.split(':')[0] * 60 + this.taskDetail[i][j].dateEnd.split(':')[1] * 1;
-        if(startMin < minMin || endMin > maxMin) {
-          this.taskDetail[i].splice(j, 1);
-          j--;
-          continue
-        }
-        // console.log(endMin);
-        let difMin = endMin - startMin;
-        console.log(difMin)
-        // console.log(startMin);
-        // console.log(endMin);
-        this.taskDetail[i][j].styleObj = {
-          height: difMin * this.unit.height / 60 + 'px',
-          width: this.unit.width + '%',
-          top: ((startMin - (this.pageTimeGround[0].split(":")[0] * 60 + this.pageTimeGround[0].split(":")[1] * 1)) * this.unit.height / 60) + this.unit.height / 2 + 'px',
-          backgroundColor: this.color[~~(Math.random() * this.color.length)]
-        }
-        // console.log(this.color[~~(Math.random() * 4)]);
-        // console.log(this.taskDetail);
-        // console.log(this.timeGround);
-      }
-		}
-		console.log(this.taskDetail);
-	},
 	mounted() {
-		this.taskListSty.height = (this.pageTimeGround.length - 1) * this.unit.height + 'px';
-		// this.timeListSty.width = this.weekGround.length * 14 + '%';
-
-		// console.log(this.taskDetail);
-		// console.log(this.weekGround);
+		this.init();
 	},
 	methods: {
+    init() {
+      this.unit.height = this.unitHeight
+
+      this.unit.width = (100 / (this.weekGround.length + 1));
+      this.timeListSty.width = this.unit.width * this.weekGround.length + '%'
+      this.timeListSty.marginLeft = this.unit.width + "%"
+      // console.log(this.ta)
+      this.pageTimeGround = this.initTimeGroud(this.timeGround);
+      this.taskListSty.height = (this.pageTimeGround.length - 1) * this.unit.height + 'px';
+
+      let maxTime = this.pageTimeGround[this.pageTimeGround.length - 1];
+      let minTime = this.pageTimeGround[0];
+      let maxMin = maxTime.split(':')[0] * 60 + maxTime.split(':')[1] * 1;
+      let minMin = minTime.split(':')[0] * 60 + minTime.split(':')[1] * 1;
+      // console.log(maxMin);
+      // console.log(minMin);
+      // console.log(maxTime);
+      for (let i = 0; i < this.taskDetail.length; i++) {
+        for (let j = 0; j < this.taskDetail[i].length; j++) {
+          // console.log(this.taskDetail[i][j]);
+          let startMin = this.taskDetail[i][j].dateStart.split(':')[0] * 60 + this.taskDetail[i][j].dateStart.split(':')[1] * 1;
+          let endMin = this.taskDetail[i][j].dateEnd.split(':')[0] * 60 + this.taskDetail[i][j].dateEnd.split(':')[1] * 1;
+          if(startMin < minMin || endMin > maxMin) {
+            this.taskDetail[i].splice(j, 1);
+            j--;
+            continue
+          }
+          // console.log(endMin);
+          let difMin = endMin - startMin;
+          console.log(difMin)
+          // console.log(startMin);
+          // console.log(endMin);
+          this.taskDetail[i][j].styleObj = {
+            height: difMin * this.unit.height / 60 + 'px',
+            width: this.unit.width + '%',
+            top: ((startMin - (this.pageTimeGround[0].split(":")[0] * 60 + this.pageTimeGround[0].split(":")[1] * 1)) * this.unit.height / 60) + this.unit.height / 2 + 'px',
+            backgroundColor: this.color[~~(Math.random() * this.color.length)]
+          }
+          // console.log(this.color[~~(Math.random() * 4)]);
+          // console.log(this.taskDetail);
+          // console.log(this.timeGround);
+        }
+      }
+      console.log(this.taskDetail);
+    },
 		showDetail(obj, week){
-			obj.week = week;
-			this.showModalDetail = obj;
-			this.showModal = !this.showModal;
+      obj.week = week;
+      this.$emit('click',obj)
 		},
 		initTimeGroud(value){
 			if(value && value.length == 2){
