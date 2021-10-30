@@ -93,7 +93,8 @@
           }
 
         ]
-      ]">
+      ]"
+    style="width: 80%">
 
     </Schedule>
   </div>

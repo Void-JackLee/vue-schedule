@@ -2,16 +2,22 @@
   <div class="schedule">
     <div class="time-ground">
       <ul>
-        <li v-for="(time , index) in pageTimeGround" v-bind:key="index">
-          <span>{{time}}</span>
+        <li v-for="(time , index) in pageTimeGround" v-bind:key="index"
+            :style="`--unitPerHeight: ${unit.height}px`">
+          <span :style="`left: ${unit.width / 2}%`">{{time}}</span>
           <p :style="timeListSty"></p>
         </li>
       </ul>
     </div>
     <div class="task-ground">
       <ul>
-        <li v-for="(week, index) in weekGround" class="task-list" v-bind:key="index">
-          <p>{{week}}</p>
+        <li class="task-list task-list-blank"
+            :style="`width: ${unit.width}%;`"/>
+        <li v-for="(week, index) in weekGround" class="task-list" v-bind:key="index"
+            :style="'width: ' + unit.width + '%'">
+          <p
+              :style="`--unitPerHeight: ${unit.height}px`"
+          >{{week}}</p>
           <ul :style="taskListSty">
             <li class="task-list-item" v-for="(detail,idx) in taskDetail[index]" :style="detail.styleObj" @click="showDetail(detail, week)" v-bind:key="idx">
               <p>{{detail.dateStart}} - {{detail.dateEnd}}</p>
@@ -21,77 +27,141 @@
         </li>
       </ul>
     </div>
+    <div :style="`height: ${parseInt(taskListSty.height.substr(0,taskListSty.height.length - 2)) + unit.height}px`"></div>
 
     <modal :show="showModal" :show-modal-detail="showModalDetail"> </modal>
   </div>
 </template>
 
-<style scoped>
-	.schedule{
-		width: 80%;
+<style lang="scss" scoped>
+
+  p {
+    margin: 0;
+  }
+
+  ol, ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+	.schedule {
+		width: 100%;
 		max-width: 1400px;
 		margin: 0 auto;
 		position: relative;
 	}
-	.time-ground{
+	.time-ground {
 		display: block;
 		position: absolute;
 		left: 0;
 		top: 0;
 		width: 100%;
-	}
-	.time-ground ul li{
-		margin-top: 50px;
-		font-size: 1rem;
-		height: 50px;
-	}
-	.time-ground ul li span{
-		position: absolute;
-		left: -60px;
-		transform: translateY(-50%);
-	}
-	.time-ground ul li p{
-		position:absolute;
-		left: 0;
 
-		height: 1px;
-		background-color: #EAEAEA;
+    ul {
+      li {
+        margin-top: calc(var(--unitPerHeight) / 2);
+        font-size: 1rem;
+        height: calc(var(--unitPerHeight) / 2);
+
+        span {
+          position: absolute;
+          transform: translate(-50%,-50%);
+        }
+
+        p {
+          position:absolute;
+          left: 0;
+
+          height: 1px;
+          background-color: #EAEAEA;
+        }
+      }
+
+    }
 	}
-	.task-ground{
+
+
+	.task-ground {
 		width: 100%;
 	}
+
+
 	.task-list{
 		float: left;
-		width: 14%;
-		box-sizing:border-box;
-		border:1px solid #EAEAEA;
+		/*width: 20%;*/
+		box-sizing: border-box;
+		border: 1px solid #EAEAEA;
+
+    p {
+      text-align: center;
+      font-size: 1rem;
+      height: calc(var(--unitPerHeight) / 2);
+      line-height: calc(var(--unitPerHeight) / 2);
+    }
 	}
-	.task-list p{
-		text-align: center;
-		font-size: 1rem;
-		padding: 1rem;
-	}
+
+  .task-list-blank {
+    border: 1px solid rgba(0,0,0,0);
+  }
+
+
 	.task-list-item{
 		position: absolute;
 		background-color: #577F92;
-		width: 14%;
-		height: 50px;
+		/*width: 20%;*/
+		height: 20px;
 		cursor: pointer;
-	}
-	.task-list-item p{
-		text-align: left;
-		padding: 0;
-		margin: 1rem 0 0 1rem;
-		font-size: 0.8rem;
-		color: #EDF2F6;
-	}
-	.task-list-item h3{
-		color: #E0E7E9;
-		margin: 1rem 0 0 1rem;
+
+    p {
+      text-align: left;
+      padding: 0;
+      margin: 1rem 0 0 1rem;
+      font-size: 0.8rem;
+      color: #EDF2F6;
+    }
+
+    h3 {
+      color: #E0E7E9;
+      margin: 1rem 0 0 1rem;
+    }
 	}
 </style>
 
+<style>
+
+</style>
+
 <script>
+const data = {
+  pageTimeGround: [],
+  showModal: false,
+  showModalDetail: {
+    dateStart: '09:30',
+    dateEnd: '10:30',
+    title: 'Metting',
+    week: 'Monday',
+    styleObj: {
+      backgroundColor: "#903749"
+    },
+    detail: 'Metting (German: Mettingen) is a commune in the Moselle department in Grand Est in north-eastern France.'
+  },
+  taskListSty: {
+    height: '900px'
+  },
+  timeListSty: {
+    width: '100%',
+    marginLeft: '20%'
+  },
+
+  unit: {
+    height: 100, // px
+    width: 20 // %
+  }
+
+}
+
+
 import Modal from './Modal.vue';
 export default {
 	name: 'Schedule',
@@ -145,28 +215,12 @@ export default {
 		}
 	},
 	data() {
-		return {
-			pageTimeGround: [],
-			showModal: false,
-			showModalDetail: {
-				dateStart: '09:30',
-				dateEnd: '10:30',
-				title: 'Metting',
-				week: 'Monday',
-				styleObj: {
-					backgroundColor: "#903749"
-				},
-				detail: 'Metting (German: Mettingen) is a commune in the Moselle department in Grand Est in north-eastern France.'
-			},
-			taskListSty: {
-				height: '900px'
-			},
-			timeListSty: {
-				width: '100%'
-			}
-		}
+		return data
 	},
 	created() {
+    this.unit.width = (100 / (this.weekGround.length + 1));
+    this.timeListSty.width = this.unit.width * this.weekGround.length + '%'
+    this.timeListSty.marginLeft = this.unit.width + "%"
 		// console.log(this.ta)
 		this.pageTimeGround = this.initTimeGroud(this.timeGround);
 
@@ -189,11 +243,13 @@ export default {
         }
         // console.log(endMin);
         let difMin = endMin - startMin;
+        console.log(difMin)
         // console.log(startMin);
         // console.log(endMin);
         this.taskDetail[i][j].styleObj = {
-          height: difMin * 100 / 60 + 'px',
-          top: ((startMin - (this.pageTimeGround[0].split(":")[0] * 60 + this.pageTimeGround[0].split(":")[1] * 1)) * 100 / 60) + 50 + 'px',
+          height: difMin * this.unit.height / 60 + 'px',
+          width: this.unit.width + '%',
+          top: ((startMin - (this.pageTimeGround[0].split(":")[0] * 60 + this.pageTimeGround[0].split(":")[1] * 1)) * this.unit.height / 60) + this.unit.height / 2 + 'px',
           backgroundColor: this.color[~~(Math.random() * this.color.length)]
         }
         // console.log(this.color[~~(Math.random() * 4)]);
@@ -204,8 +260,8 @@ export default {
 		console.log(this.taskDetail);
 	},
 	mounted() {
-		this.taskListSty.height = (this.pageTimeGround.length - 1) * 100 + 'px';
-		this.timeListSty.width = this.weekGround.length * 14 + '%';
+		this.taskListSty.height = (this.pageTimeGround.length - 1) * this.unit.height + 'px';
+		// this.timeListSty.width = this.weekGround.length * 14 + '%';
 
 		// console.log(this.taskDetail);
 		// console.log(this.weekGround);
